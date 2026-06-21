@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор паролей</title>
+    <title>Генератор паролей / Password Generator</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -21,6 +21,28 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             width: 350px;
             text-align: center;
+            position: relative;
+        }
+        /* Переключатель языков */
+        .lang-switch {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+        .lang-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+            padding: 2px 5px;
+            margin: 0 2px;
+            transition: color 0.2s;
+        }
+        .lang-btn.active {
+            color: #008CBA;
+            border-bottom: 2px solid #008CBA;
         }
         .app-logo {
             width: 120px;
@@ -54,7 +76,7 @@
         .setting input[type="range"] {
             width: 60%;
         }
-        button {
+        button.action-btn {
             width: 100%;
             padding: 12px;
             font-size: 16px;
@@ -74,38 +96,106 @@
 <body>
 
 <div class="container">
+    <div class="lang-switch">
+        <button class="lang-btn active" onclick="changeLanguage('ru')" id="btn-ru">RU</button>
+        <button class="lang-btn" onclick="changeLanguage('en')" id="btn-en">EN</button>
+    </div>
+
     <img src="logo.png" alt="Логотип" class="app-logo">
 
     <input type="text" id="passwordDisplay" placeholder="Здесь будет пароль" readonly>
     
     <div class="setting">
-        <label>Длина (<span id="lengthValue">12</span>):</label>
+        <label id="lbl-length">Длина (<span id="lengthValue">12</span>):</label>
         <input type="range" id="passwordLength" min="8" max="24" value="12" oninput="document.getElementById('lengthValue').innerText = this.value">
     </div>
     
     <div class="setting">
-        <label>Буквы (A-Z, a-z)</label>
+        <label id="lbl-letters">Буквы (A-Z, a-z)</label>
         <input type="checkbox" id="includeLetters" checked>
     </div>
     
     <div class="setting">
-        <label>Цифры (0-9)</label>
+        <label id="lbl-digits">Цифры (0-9)</label>
         <input type="checkbox" id="includeDigits" checked>
     </div>
     
     <div class="setting">
-        <label>Спецсимволы (%@#!)</label>
+        <label id="lbl-specials">Спецсимволы (%@#!)</label>
         <input type="checkbox" id="includeSpecials" checked>
     </div>
 
-    <button class="btn-generate" onclick="generatePassword()">Сгенерировать</button>
-    <button class="btn-copy" onclick="copyToClipboard()">Копировать в буфер</button>
+    <button class="action-btn btn-generate" id="btn-generate" onclick="generatePassword()">Сгенерировать</button>
+    <button class="action-btn btn-copy" id="btn-copy" onclick="copyToClipboard()">Копировать в буфер</button>
 </div>
 
 <script>
+// Текущий язык по умолчанию
+let currentLang = 'ru';
+
+// Словари переводов
+const translations = {
+    ru: {
+        placeholder: "Здесь будет пароль",
+        length: "Длина",
+        letters: "Буквы (A-Z, a-z)",
+        digits: "Цифры (0-9)",
+        specials: "Спецсимволы (%@#!)",
+        btnGenerate: "Сгенерировать",
+        btnCopy: "Копировать в буфер",
+        errNoTypes: "Внимание! Выберите хотя бы один тип символов!",
+        errEmptyPass: "Внимание! Сначала сгенерируйте пароль!",
+        successCopy: "Успех! Пароль скопирован в буфер обмена!",
+        logStart: "[СИСТЕМА] Генератор успешно запущен.",
+        logError: "[ОШИБКА] Не выбрано ни одного набора символов.",
+        logSuccess: "[ИНФО] Сгенерирован пароль длиной ",
+        logCopySuccess: "[УСПЕХ] Пароль скопирован.",
+        logCopyWarn: "[ВНИМАНИЕ] Попытка копирования пустого поля."
+    },
+    en: {
+        placeholder: "Password will be here",
+        length: "Length",
+        letters: "Letters (A-Z, a-z)",
+        digits: "Digits (0-9)",
+        specials: "Special chars (%@#!)",
+        btnGenerate: "Generate Password",
+        btnCopy: "Copy to Clipboard",
+        errNoTypes: "Warning! Select at least one character type!",
+        errEmptyPass: "Warning! Generate a password first!",
+        successCopy: "Success! Password copied to clipboard!",
+        logStart: "[SYSTEM] Password generator successfully started.",
+        logError: "[ERROR] No character sets selected.",
+        logSuccess: "[INFO] Password generated with length ",
+        logCopySuccess: "[SUCCESS] Password copied.",
+        logCopyWarn: "[WARNING] Attempt to copy an empty field."
+    }
+};
+
 function getTimestamp() {
     const now = new Date();
     return now.toLocaleTimeString('ru-RU') + '.' + String(now.getMilliseconds()).padStart(3, '0');
+}
+
+// Функция смены языка интерфейса
+function changeLanguage(lang) {
+    currentLang = lang;
+    
+    // Меняем активную кнопку в переключателе
+    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    
+    // Обновляем текст на странице
+    const t = translations[lang];
+    document.getElementById('passwordDisplay').placeholder = t.placeholder;
+    
+    const lenVal = document.getElementById('lengthValue').innerText;
+    document.getElementById('lbl-length').innerHTML = `${t.length} (<span id="lengthValue">${lenVal}</span>):`;
+    
+    document.getElementById('lbl-letters').innerText = t.letters;
+    document.getElementById('lbl-digits').innerText = t.digits;
+    document.getElementById('lbl-specials').innerText = t.specials;
+    document.getElementById('btn-generate').innerText = t.btnGenerate;
+    document.getElementById('btn-copy').innerText = t.btnCopy;
 }
 
 function generatePassword() {
@@ -124,37 +214,46 @@ function generatePassword() {
     if (includeDigits) allCharacters += digits;
     if (includeSpecials) allCharacters += specials;
 
+    const t = translations[currentLang];
+
     if (!allCharacters) {
-        console.warn(`[${getTimestamp()}] [ОШИБКА] Не выбрано ни одного набора символов.`);
-        alert("Внимание! Выберите хотя бы один тип символов!");
+        console.warn(`[${getTimestamp()}] ${t.logError}`);
+        alert(t.errNoTypes);
         return;
     }
 
     let generatedPassword = "";
-    
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * allCharacters.length);
         generatedPassword += allCharacters[randomIndex];
     }
 
     document.getElementById('passwordDisplay').value = generatedPassword;
-    
-    console.log(`[${getTimestamp()}] [ИНФО] Сгенерирован пароль длиной ${length}.`);
+    console.log(`[${getTimestamp()}] ${t.logSuccess}${length}.`);
 }
 
 function copyToClipboard() {
     const passwordField = document.getElementById('passwordDisplay');
+    const t = translations[currentLang];
+
     if (passwordField.value) {
         navigator.clipboard.writeText(passwordField.value).then(() => {
-            console.log(`[${getTimestamp()}] [УСПЕХ] Пароль скопирован.`);
-            alert("Успех! Пароль скопирован в буфер обмена!");
+            console.log(`[${getTimestamp()}] ${t.logCopySuccess}`);
+            alert(t.successCopy);
         }).catch(err => {
-            console.error("Ошибка при копировании: ", err);
+            console.error("Error: ", err);
         });
     } else {
-        console.warn(`[${getTimestamp()}] [ВНИМАНИЕ] Попытка копирования пустого поля.`);
-        alert("Внимание! Сначала сгенерируйте пароль!");
+        console.warn(`[${getTimestamp()}] ${t.logCopyWarn}`);
+        alert(t.errEmptyPass);
     }
+}
+
+console.log(`[${getTimestamp()}] ${translations[currentLang].logStart}`);
+</script>
+
+</body>
+</html>
 }
 
 console.log(`[${getTimestamp()}] [СИСТЕМА] Генератор успешно запущен.`);
