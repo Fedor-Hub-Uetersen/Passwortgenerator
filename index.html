@@ -2,259 +2,143 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор паролей / Password Generator</title>
+    <title>Генератор паролей</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', sans-serif;
+            /* Неоновый градиентный фон */
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            color: #fff;
         }
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 20px;
+            /* Неоновое свечение контейнера */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 500px;
             text-align: center;
-            position: relative;
-        }
-        /* Переключатель языков */
-        .lang-switch {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-        }
-        .lang-btn {
-            background: none;
-            border: none;
-            font-size: 14px;
-            font-weight: bold;
-            color: #888;
-            cursor: pointer;
-            padding: 2px 5px;
-            margin: 0 2px;
-            transition: color 0.2s;
-        }
-        .lang-btn.active {
-            color: #008CBA;
-            border-bottom: 2px solid #008CBA;
         }
         .app-logo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            border: 3px solid #008CBA;
+            width: 140px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            /* Свечение вокруг лого */
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
         }
         input[type="text"] {
-            width: 90%;
-            padding: 10px;
-            font-size: 18px;
+            width: 100%;
+            padding: 15px;
+            font-size: 22px;
             text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            background: #1a1a2e;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0, 210, 255, 0.2);
         }
         .setting {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            font-size: 15px;
+            margin-bottom: 20px;
+            font-size: 18px;
         }
-        .setting input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-        }
-        .setting input[type="range"] {
-            width: 60%;
-        }
-        button.action-btn {
+        button {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            color: white;
+            padding: 15px;
+            font-size: 18px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.2s;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
         }
-        .btn-generate { background-color: #4CAF50; }
-        .btn-generate:hover { background-color: #45a049; }
-        .btn-copy { background-color: #008CBA; }
-        .btn-copy:hover { background-color: #007bb5; }
+        .btn-generate { 
+            background: #00d2ff; 
+            color: #0f0c29; 
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+        }
+        .btn-generate:hover { box-shadow: 0 0 25px rgba(0, 210, 255, 0.8); }
+        .btn-copy { 
+            background: transparent; 
+            border: 2px solid #00d2ff; 
+            color: #00d2ff; 
+        }
+        .btn-copy:hover { background: #00d2ff; color: #0f0c29; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="lang-switch">
-        <button class="lang-btn active" onclick="changeLanguage('ru')" id="btn-ru">RU</button>
-        <button class="lang-btn" onclick="changeLanguage('en')" id="btn-en">EN</button>
-    </div>
-
-    <img src="logo.png" alt="Логотип" class="app-logo">
-
-    <input type="text" id="passwordDisplay" placeholder="Здесь будет пароль" readonly>
+    <img src="images/logo.png" alt="Logo" class="app-logo">
+    <input type="text" id="passwordDisplay" placeholder="PASSWORD" readonly>
     
     <div class="setting">
-        <label id="lbl-length">Длина (<span id="lengthValue">12</span>):</label>
+        <label>Длина (<span id="lengthValue">12</span>):</label>
         <input type="range" id="passwordLength" min="8" max="24" value="12" oninput="document.getElementById('lengthValue').innerText = this.value">
     </div>
     
     <div class="setting">
-        <label id="lbl-letters">Буквы (A-Z, a-z)</label>
+        <label>Буквы</label>
         <input type="checkbox" id="includeLetters" checked>
     </div>
     
     <div class="setting">
-        <label id="lbl-digits">Цифры (0-9)</label>
+        <label>Цифры</label>
         <input type="checkbox" id="includeDigits" checked>
     </div>
     
     <div class="setting">
-        <label id="lbl-specials">Спецсимволы (%@#!)</label>
+        <label>Спецсимволы</label>
         <input type="checkbox" id="includeSpecials" checked>
     </div>
 
-    <button class="action-btn btn-generate" id="btn-generate" onclick="generatePassword()">Сгенерировать</button>
-    <button class="action-btn btn-copy" id="btn-copy" onclick="copyToClipboard()">Копировать в буфер</button>
+    <button class="btn-generate" onclick="generatePassword()">Сгенерировать</button>
+    <button class="btn-copy" onclick="copyToClipboard()">Копировать</button>
 </div>
 
 <script>
-// Текущий язык по умолчанию
-let currentLang = 'ru';
-
-// Словари переводов
-const translations = {
-    ru: {
-        placeholder: "Здесь будет пароль",
-        length: "Длина",
-        letters: "Буквы (A-Z, a-z)",
-        digits: "Цифры (0-9)",
-        specials: "Спецсимволы (%@#!)",
-        btnGenerate: "Сгенерировать",
-        btnCopy: "Копировать в буфер",
-        errNoTypes: "Внимание! Выберите хотя бы один тип символов!",
-        errEmptyPass: "Внимание! Сначала сгенерируйте пароль!",
-        successCopy: "Успех! Пароль скопирован в буфер обмена!",
-        logStart: "[СИСТЕМА] Генератор успешно запущен.",
-        logError: "[ОШИБКА] Не выбрано ни одного набора символов.",
-        logSuccess: "[ИНФО] Сгенерирован пароль длиной ",
-        logCopySuccess: "[УСПЕХ] Пароль скопирован.",
-        logCopyWarn: "[ВНИМАНИЕ] Попытка копирования пустого поля."
-    },
-    en: {
-        placeholder: "Password will be here",
-        length: "Length",
-        letters: "Letters (A-Z, a-z)",
-        digits: "Digits (0-9)",
-        specials: "Special chars (%@#!)",
-        btnGenerate: "Generate Password",
-        btnCopy: "Copy to Clipboard",
-        errNoTypes: "Warning! Select at least one character type!",
-        errEmptyPass: "Warning! Generate a password first!",
-        successCopy: "Success! Password copied to clipboard!",
-        logStart: "[SYSTEM] Password generator successfully started.",
-        logError: "[ERROR] No character sets selected.",
-        logSuccess: "[INFO] Password generated with length ",
-        logCopySuccess: "[SUCCESS] Password copied.",
-        logCopyWarn: "[WARNING] Attempt to copy an empty field."
-    }
-};
-
-function getTimestamp() {
-    const now = new Date();
-    return now.toLocaleTimeString('ru-RU') + '.' + String(now.getMilliseconds()).padStart(3, '0');
-}
-
-// Функция смены языка интерфейса
-function changeLanguage(lang) {
-    currentLang = lang;
-    
-    // Меняем активную кнопку в переключателе
-    document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
-    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-    
-    // Обновляем текст на странице
-    const t = translations[lang];
-    document.getElementById('passwordDisplay').placeholder = t.placeholder;
-    
-    const lenVal = document.getElementById('lengthValue').innerText;
-    document.getElementById('lbl-length').innerHTML = `${t.length} (<span id="lengthValue">${lenVal}</span>):`;
-    
-    document.getElementById('lbl-letters').innerText = t.letters;
-    document.getElementById('lbl-digits').innerText = t.digits;
-    document.getElementById('lbl-specials').innerText = t.specials;
-    document.getElementById('btn-generate').innerText = t.btnGenerate;
-    document.getElementById('btn-copy').innerText = t.btnCopy;
-}
-
 function generatePassword() {
-    const length = parseInt(document.getElementById('passwordLength').value);
+    const length = document.getElementById('passwordLength').value;
     const includeLetters = document.getElementById('includeLetters').checked;
     const includeDigits = document.getElementById('includeDigits').checked;
     const includeSpecials = document.getElementById('includeSpecials').checked;
 
     let allCharacters = "";
-    
-    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const digits = "0123456789";
-    const specials = "%@#!*&?$"; 
+    if (includeLetters) allCharacters += "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if (includeDigits) allCharacters += "0123456789";
+    if (includeSpecials) allCharacters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-    if (includeLetters) allCharacters += letters;
-    if (includeDigits) allCharacters += digits;
-    if (includeSpecials) allCharacters += specials;
-
-    const t = translations[currentLang];
-
-    if (!allCharacters) {
-        console.warn(`[${getTimestamp()}] ${t.logError}`);
-        alert(t.errNoTypes);
-        return;
-    }
+    if (!allCharacters) { alert("Выберите хотя бы один тип символов!"); return; }
 
     let generatedPassword = "";
     for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * allCharacters.length);
-        generatedPassword += allCharacters[randomIndex];
+        generatedPassword += allCharacters[Math.floor(Math.random() * allCharacters.length)];
     }
-
     document.getElementById('passwordDisplay').value = generatedPassword;
-    console.log(`[${getTimestamp()}] ${t.logSuccess}${length}.`);
 }
 
 function copyToClipboard() {
     const passwordField = document.getElementById('passwordDisplay');
-    const t = translations[currentLang];
-
     if (passwordField.value) {
-        navigator.clipboard.writeText(passwordField.value).then(() => {
-            console.log(`[${getTimestamp()}] ${t.logCopySuccess}`);
-            alert(t.successCopy);
-        }).catch(err => {
-            console.error("Error: ", err);
-        });
+        navigator.clipboard.writeText(passwordField.value);
+        alert("Скопировано!");
     } else {
-        console.warn(`[${getTimestamp()}] ${t.logCopyWarn}`);
-        alert(t.errEmptyPass);
+        alert("Сначала сгенерируйте!");
     }
 }
-
-console.log(`[${getTimestamp()}] ${translations[currentLang].logStart}`);
 </script>
-
-</body>
-</html>
-</body>
-</html>
 </body>
 </html>
