@@ -22,7 +22,6 @@
             width: 350px;
             text-align: center;
         }
-        /* Стили для круглого логотипа программы */
         .app-logo {
             width: 120px;
             height: 120px;
@@ -75,7 +74,7 @@
 <body>
 
 <div class="container">
-    <img src="images/logo.png" alt="Логотип Генератора Паролей" class="app-logo">
+    <img src="images/logo.png" alt="Логотип" class="app-logo">
 
     <input type="text" id="passwordDisplay" placeholder="Здесь будет пароль" readonly>
     
@@ -104,30 +103,37 @@
 </div>
 
 <script>
-// Функция для красивого форматирования времени в логах
 function getTimestamp() {
     const now = new Date();
     return now.toLocaleTimeString('ru-RU') + '.' + String(now.getMilliseconds()).padStart(3, '0');
 }
 
 function generatePassword() {
-    const length = document.getElementById('passwordLength').value;
+    const length = parseInt(document.getElementById('passwordLength').value);
     const includeLetters = document.getElementById('includeLetters').checked;
     const includeDigits = document.getElementById('includeDigits').checked;
     const includeSpecials = document.getElementById('includeSpecials').checked;
 
     let allCharacters = "";
-    if (includeLetters) allCharacters += "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if (includeDigits) allCharacters += "0123456789";
-    if (includeSpecials) allCharacters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+    
+    // Безопасный набор спецсимволов, как в описании интерфейса
+    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    const specials = "%@#!*&?$"; 
+
+    if (includeLetters) allCharacters += letters;
+    if (includeDigits) allCharacters += digits;
+    if (includeSpecials) allCharacters += specials;
 
     if (!allCharacters) {
-        console.warn(`[${getTimestamp()}] [ОШИБКА] Попытка генерации без выбранных наборов символов.`);
+        console.warn(`[${getTimestamp()}] [ОШИБКА] Не выбрано ни одного набора символов.`);
         alert("Внимание! Выберите хотя бы один тип символов!");
         return;
     }
 
     let generatedPassword = "";
+    
+    // Генерируем случайный пароль
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * allCharacters.length);
         generatedPassword += allCharacters[randomIndex];
@@ -135,27 +141,26 @@ function generatePassword() {
 
     document.getElementById('passwordDisplay').value = generatedPassword;
     
-    // Запись в лог
-    console.log(`[${getTimestamp()}] [ИНФО] Сгенерирован пароль длиной ${length}. Настройки: Буквы=${includeLetters}, Цифры=${includeDigits}, Спецы=${includeSpecials}`);
+    console.log(`[${getTimestamp()}] [ИНФО] Сгенерирован пароль длиной ${length}.`);
 }
 
 function copyToClipboard() {
     const passwordField = document.getElementById('passwordDisplay');
     if (passwordField.value) {
-        navigator.clipboard.writeText(passwordField.value);
-        console.log(`[${getTimestamp()}] [УСПЕХ] Пароль успешно скопирован в буфер обмена.`);
-        alert("Успех! Пароль скопирован в буфер обмена!");
+        navigator.clipboard.writeText(passwordField.value).then(() => {
+            console.log(`[${getTimestamp()}] [УСПЕХ] Пароль скопирован.`);
+            alert("Успех! Пароль скопирован в буфер обмена!");
+        }).catch(err => {
+            console.error("Ошибка при копировании: ", err);
+        });
     } else {
-        console.warn(`[${getTimestamp()}] [ВНИМАНИЕ] Попытка копирования пустого пароля.`);
+        console.warn(`[${getTimestamp()}] [ВНИМАНИЕ] Попытка копирования пустого поля.`);
         alert("Внимание! Сначала сгенерируйте пароль!");
     }
 }
 
-// Стартовый лог при загрузке страницы
-console.log(`[${getTimestamp()}] [СИСТЕМА] Генератор паролей успешно запущен и готов к работе.`);
+console.log(`[${getTimestamp()}] [СИСТЕМА] Генератор успешно запущен.`);
 </script>
 
-</body>
-</html>
 </body>
 </html>
