@@ -108,8 +108,27 @@
             background: transparent; 
             border: 2px solid #00d2ff; 
             color: #00d2ff; 
+            margin-bottom: 15px; /* Сделали отступ до подвала */
         }
         .btn-copy:hover { background: #00d2ff; color: #0f0c29; }
+        
+        /* Стили для подвала (авторские права) */
+        .footer-credits {
+            margin-top: 25px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+        .footer-credits a {
+            color: #00d2ff;
+            text-decoration: none;
+        }
+        .footer-credits a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -146,10 +165,14 @@
 
     <button class="main-btn btn-generate" id="btnGen" onclick="generatePassword()">Сгенерировать</button>
     <button class="main-btn btn-copy" id="btnCopy" onclick="copyToClipboard()">Копировать</button>
+
+    <div class="footer-credits">
+        © 2026 Tech.chebur.shop, Uetersen, Germany.<br>
+        <a href="tel:+49017661566343">+49017661566343</a>
+    </div>
 </div>
 
 <script>
-// Переводы текстов для трех языков
 const translations = {
     ru: {
         length: "Длина",
@@ -182,7 +205,7 @@ const translations = {
         specials: "Sonderzeichen",
         generate: "Generieren",
         copy: "Kopieren",
-        placeholder: "PASSWORT НАBЕN",
+        placeholder: "PASSWORT HABEN",
         errNoTypes: "Wählen Sie mindestens einen Zeichentyp aus!",
         successCopy: "In Zwischenablage kopiert!",
         errNoPass: "Zuerst Passwort generieren!"
@@ -194,13 +217,11 @@ let currentLang = 'ru';
 function setLanguage(lang) {
     currentLang = lang;
     
-    // Обновляем активную кнопку
     document.querySelectorAll('.lang-btn').forEach(btn => {
         if(btn.innerText.toLowerCase() === lang) btn.classList.add('active');
         else btn.classList.remove('active');
     });
 
-    // Меняем тексты на странице
     document.getElementById('lblLength').childNodes[0].textContent = translations[lang].length + " (";
     document.getElementById('lblLetters').innerText = translations[lang].letters;
     document.getElementById('lblDigits').innerText = translations[lang].digits;
@@ -259,7 +280,6 @@ function copyToClipboard() {
     }
 }
 
-// Стартовый системный лог
 console.log(`[${getTimestamp()}] [СИСТЕМА] Многоязычный генератор успешно запущен.`);
 </script>
 </body>
