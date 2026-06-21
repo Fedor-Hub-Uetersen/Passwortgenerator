@@ -2,11 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Генератор паролей</title>
+    <title>Генератор паролей / Password Generator</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            /* Неоновый градиентный фон */
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             display: flex;
             justify-content: center;
@@ -17,21 +16,42 @@
         }
         .container {
             background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
+            padding: 35px;
             border-radius: 20px;
-            /* Неоновое свечение контейнера */
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
             width: 100%;
             max-width: 500px;
             text-align: center;
+            box-sizing: border-box;
+            position: relative;
+        }
+        /* Блок переключения языков */
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 8px;
+            padding: 2px 5px;
+            transition: 0.2s;
+        }
+        .lang-btn.active, .lang-btn:hover {
+            color: #00d2ff;
+            text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
         }
         .app-logo {
             width: 140px;
             height: auto;
             border-radius: 15px;
             margin-bottom: 25px;
-            /* Свечение вокруг лого */
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
         }
         input[type="text"] {
@@ -45,6 +65,7 @@
             border-radius: 10px;
             margin-bottom: 25px;
             box-shadow: inset 0 0 10px rgba(0, 210, 255, 0.2);
+            box-sizing: border-box;
         }
         .setting {
             display: flex;
@@ -53,7 +74,19 @@
             margin-bottom: 20px;
             font-size: 18px;
         }
-        button {
+        .setting label {
+            text-align: left;
+        }
+        .setting input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .setting input[type="range"] {
+            width: 50%;
+            cursor: pointer;
+        }
+        button.main-btn {
             width: 100%;
             padding: 15px;
             font-size: 18px;
@@ -82,34 +115,112 @@
 <body>
 
 <div class="container">
-    <img src="images/logo.png" alt="Logo" class="app-logo">
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" onclick="setLanguage('de')">DE</button>
+    </div>
+
+    <img src="logo.png" alt="Logo" class="app-logo">
     <input type="text" id="passwordDisplay" placeholder="PASSWORD" readonly>
     
     <div class="setting">
-        <label>Длина (<span id="lengthValue">12</span>):</label>
+        <label id="lblLength">Длина (<span id="lengthValue">12</span>):</label>
         <input type="range" id="passwordLength" min="8" max="24" value="12" oninput="document.getElementById('lengthValue').innerText = this.value">
     </div>
     
     <div class="setting">
-        <label>Буквы</label>
+        <label id="lblLetters">Буквы</label>
         <input type="checkbox" id="includeLetters" checked>
     </div>
     
     <div class="setting">
-        <label>Цифры</label>
+        <label id="lblDigits">Цифры</label>
         <input type="checkbox" id="includeDigits" checked>
     </div>
     
     <div class="setting">
-        <label>Спецсимволы</label>
+        <label id="lblSpecials">Спецсимволы</label>
         <input type="checkbox" id="includeSpecials" checked>
     </div>
 
-    <button class="btn-generate" onclick="generatePassword()">Сгенерировать</button>
-    <button class="btn-copy" onclick="copyToClipboard()">Копировать</button>
+    <button class="main-btn btn-generate" id="btnGen" onclick="generatePassword()">Сгенерировать</button>
+    <button class="main-btn btn-copy" id="btnCopy" onclick="copyToClipboard()">Копировать</button>
 </div>
 
 <script>
+// Переводы текстов для трех языков
+const translations = {
+    ru: {
+        length: "Длина",
+        letters: "Буквы",
+        digits: "Цифры",
+        specials: "Спецсимволы",
+        generate: "Сгенерировать",
+        copy: "Копировать",
+        placeholder: "ЗДЕСЬ БУДЕТ ПАРОЛЬ",
+        errNoTypes: "Выберите хотя бы один тип символов!",
+        successCopy: "Скопировано в буфер обмена!",
+        errNoPass: "Сначала сгенерируйте пароль!"
+    },
+    en: {
+        length: "Length",
+        letters: "Letters",
+        digits: "Digits",
+        specials: "Special characters",
+        generate: "Generate",
+        copy: "Copy to clipboard",
+        placeholder: "PASSWORD WILL BE HERE",
+        errNoTypes: "Select at least one character type!",
+        successCopy: "Copied to clipboard!",
+        errNoPass: "Generate a password first!"
+    },
+    de: {
+        length: "Länge",
+        letters: "Buchstaben",
+        digits: "Zahlen",
+        specials: "Sonderzeichen",
+        generate: "Generieren",
+        copy: "Kopieren",
+        placeholder: "PASSWORT НАBЕN",
+        errNoTypes: "Wählen Sie mindestens einen Zeichentyp aus!",
+        successCopy: "In Zwischenablage kopiert!",
+        errNoPass: "Zuerst Passwort generieren!"
+    }
+};
+
+let currentLang = 'ru';
+
+function setLanguage(lang) {
+    currentLang = lang;
+    
+    // Обновляем активную кнопку
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        if(btn.innerText.toLowerCase() === lang) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+
+    // Меняем тексты на странице
+    document.getElementById('lblLength').childNodes[0].textContent = translations[lang].length + " (";
+    document.getElementById('lblLetters').innerText = translations[lang].letters;
+    document.getElementById('lblDigits').innerText = translations[lang].digits;
+    document.getElementById('lblSpecials').innerText = translations[lang].specials;
+    document.getElementById('btnGen').innerText = translations[lang].generate;
+    document.getElementById('btnCopy').innerText = translations[lang].copy;
+    
+    const display = document.getElementById('passwordDisplay');
+    if (!display.value) {
+        display.placeholder = translations[lang].placeholder;
+    }
+    
+    console.log(`[${getTimestamp()}] [ЯЗЫК] Изменен интерфейс на язык: ${lang.toUpperCase()}`);
+}
+
+function getTimestamp() {
+    const now = new Date();
+    return now.toLocaleTimeString('ru-RU') + '.' + String(now.getMilliseconds()).padStart(3, '0');
+}
+
 function generatePassword() {
     const length = document.getElementById('passwordLength').value;
     const includeLetters = document.getElementById('includeLetters').checked;
@@ -121,24 +232,35 @@ function generatePassword() {
     if (includeDigits) allCharacters += "0123456789";
     if (includeSpecials) allCharacters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-    if (!allCharacters) { alert("Выберите хотя бы один тип символов!"); return; }
+    if (!allCharacters) { 
+        console.warn(`[${getTimestamp()}] [ОШИБКА] Попытка генерации без символов.`);
+        alert(translations[currentLang].errNoTypes); 
+        return; 
+    }
 
     let generatedPassword = "";
     for (let i = 0; i < length; i++) {
         generatedPassword += allCharacters[Math.floor(Math.random() * allCharacters.length)];
     }
     document.getElementById('passwordDisplay').value = generatedPassword;
+    
+    console.log(`[${getTimestamp()}] [ИНФО] Сгенерирован пароль длиной ${length}. Настройки: Буквы=${includeLetters}, Цифры=${includeDigits}, Спецы=${includeSpecials}`);
 }
 
 function copyToClipboard() {
     const passwordField = document.getElementById('passwordDisplay');
     if (passwordField.value) {
         navigator.clipboard.writeText(passwordField.value);
-        alert("Скопировано!");
+        console.log(`[${getTimestamp()}] [УСПЕХ] Пароль скопирован в буфер.`);
+        alert(translations[currentLang].successCopy);
     } else {
-        alert("Сначала сгенерируйте!");
+        console.warn(`[${getTimestamp()}] [ВНИМАНИЕ] Попытка скопировать пустой результат.`);
+        alert(translations[currentLang].errNoPass);
     }
 }
+
+// Стартовый системный лог
+console.log(`[${getTimestamp()}] [СИСТЕМА] Многоязычный генератор успешно запущен.`);
 </script>
 </body>
 </html>
