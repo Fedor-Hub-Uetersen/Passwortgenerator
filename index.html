@@ -74,7 +74,7 @@
 <body>
 
 <div class="container">
-    <img src="images/logo.png" alt="Логотип" class="app-logo">
+    <img src="logo.png" alt="Логотип" class="app-logo">
 
     <input type="text" id="passwordDisplay" placeholder="Здесь будет пароль" readonly>
     
@@ -116,7 +116,6 @@ function generatePassword() {
 
     let allCharacters = "";
     
-    // Безопасный набор спецсимволов, как в описании интерфейса
     const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const digits = "0123456789";
     const specials = "%@#!*&?$"; 
@@ -133,7 +132,6 @@ function generatePassword() {
 
     let generatedPassword = "";
     
-    // Генерируем случайный пароль
     for (let i = 0; i < length; i++) {
         const randomIndex = Math.floor(Math.random() * allCharacters.length);
         generatedPassword += allCharacters[randomIndex];
@@ -162,5 +160,7 @@ function copyToClipboard() {
 console.log(`[${getTimestamp()}] [СИСТЕМА] Генератор успешно запущен.`);
 </script>
 
+</body>
+</html>
 </body>
 </html>
